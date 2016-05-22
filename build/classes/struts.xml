@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+
+	<constant name="struts.objectFactory" value="spring"></constant>
+
+	<!--解决乱码 -->
+	<constant name="struts.i18n.encoding" value="UTF-8"></constant>
+
+	<package name="struts2" extends="struts-default">
+
+		<action name="addCommodityClass" class="commodityClassAddAction">
+			<result type="redirectAction">goShopManageAction</result>
+		</action>
+
+		<action name="updateCommodityClass" class="commodityClassUpdateAction">
+			<result type="redirectAction">goShopManageAction</result>
+		</action>
+
+		<action name="addCommodity" class="commodityAddAction">
+			<result name="success" type="redirectAction">
+				goShopManageAction
+			</result>
+		</action>	
+
+		<action name="updateCommodity" class="commodityUpdateAction">
+			<result name="success" type="redirectAction">
+				goShopManageAction
+			</result>
+		</action>
+
+		<action name="deleteCommodity" class="commodityDeleteAction">
+			<result name="success" type="redirectAction">goShopManageAction</result>
+		</action>
+
+		<action name="goShopManageAction" class="goShopManageAction">
+			<result name="success">/shopManage/shopManage.jsp</result>
+		</action>
+
+		<action name="login" class="LoginAction">
+			<result name="success" type="redirectAction">
+				goShop
+			</result>
+			<result name="input">
+				/index.jsp
+			</result>
+		</action>
+
+		<action name="registration" class="RegistrationAction">
+			<result name="success">
+				goShop
+			</result>
+			<result name="input">
+				/index.jsp
+			</result>
+		</action>
+		
+		<action name="logout" class="LogoutAction">
+			<result name="success">
+				/index.jsp
+			</result>
+		</action>
+
+		<action name="goShop" class="goShopAction">
+			<result name="success">/shop.jsp</result>
+		</action>
+
+		<action name="showByClass" class="ShowByClassAction">
+			<result name="success">
+				/shop.jsp
+			</result>
+		</action>
+
+		<action name="showCommodityClass" class="ShowCommodityClassAction">
+			<result name="success">
+				/shop.jsp
+			</result>
+		</action>
+
+		<action name="showImg" class="showImgAction">
+			<result type="stream"><!--处理结果类型为流 -->
+				<param name="contentType">image/jpeg</param><!--文件类型为jpg图片 -->
+				<param name="inputName">inputStream</param><!--设置其输入流 -->
+			</result>
+		</action>
+
+		<action name="addToCar" class="AddToCarAction">
+			<result name="success">
+				/car.jsp
+			</result>
+		</action>
+
+		<action name="deleteFromCar" class="DeleteFromCar">
+			<result name="success">
+				/car.jsp
+			</result>
+		</action>
+
+
+	</package>
+
+</struts>

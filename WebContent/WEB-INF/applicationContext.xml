@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans-4.2.xsd  
+           http://www.springframework.org/schema/aop   
+           http://www.springframework.org/schema/aop/spring-aop-4.2.xsd  
+           http://www.springframework.org/schema/context  
+           http://www.springframework.org/schema/context/spring-context-4.2.xsd    
+           http://www.springframework.org/schema/tx   
+           http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+	<!-- 配置 Hibernate -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3307/sshshop" />
+		<property name="username" value="root" />
+		<property name="password" value="123" />
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		<property name="mappingResources">
+			<list>
+				<value>com/demo/Model/User.hbm.xml</value>
+				<value>com/demo/Model/Commodity.hbm.xml</value>
+				<value>com/demo/Model/CommodityClass.hbm.xml</value>
+				<value>com/demo/Model/OrderForm.hbm.xml</value>
+				<value>com/demo/Model/OrderList.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- 配置事务特性 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 配置类的方法进行事务管理 -->
+
+	<aop:config>
+		<aop:pointcut expression="execution(* com.demo.Dao.*.*(..))"
+			id="allManageMethod" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="allManageMethod" />
+	</aop:config>
+
+
+	<!-- struts beans -->
+	<bean id="userDao" class="com.demo.Dao.Impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="userService" class="com.demo.Service.Impl.UserServiceImpl">
+		<property name="userDao" ref="userDao" />
+	</bean>
+
+	<bean id="commodityClassDAO" class="com.demo.Dao.Impl.CommodityClassDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="commodityClassService" class="com.demo.Service.Impl.CommodityClassServiceImpl">
+		<property name="commodityClassDAO" ref="commodityClassDAO" />
+	</bean>
+
+	<bean id="commodityDAO" class="com.demo.Dao.Impl.CommodityDAOImpl">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<bean id="commodityService" class="com.demo.Service.Impl.CommodityServiceImpl">
+		<property name="commodityDAO" ref="commodityDAO" />
+	</bean>
+
+	<!-- struts action -->
+	<bean id="LoginAction" class="com.demo.Action.LoginAction" scope="prototype">
+		<property name="userService" ref="userService" />
+	</bean>
+
+	<bean id="RegistrationAction" class="com.demo.Action.RegistrationAction"
+		scope="prototype">
+		<property name="userService" ref="userService" />
+	</bean>
+	
+	<bean id="LogoutAction" class="com.demo.Action.LogoutAction"
+		scope="prototype">
+	</bean>
+	
+
+	<bean name="commodityClassAddAction" class="com.demo.Action.CommodityClassAddAction"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+	</bean>
+
+	<bean name="commodityClassUpdateAction" class="com.demo.Action.CommodityClassUpdateAction"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+	</bean>
+
+	<bean name="commodityAddAction" class="com.demo.Action.CommodityAddAction"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="commodityUpdateAction" class="com.demo.Action.CommodityUpdateAction"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="commodityDeleteAction" class="com.demo.Action.CommodityDeleteAction"
+		scope="prototype">
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="goShopAction" class="com.demo.Action.GoShop" scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="goShopManageAction" class="com.demo.Action.GoShopManage"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="showImgAction" class="com.demo.Action.ShowImg" scope="prototype">
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="ShowByClassAction" class="com.demo.Action.ShowByClass"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="ShowCommodityAction" class="com.demo.Action.ShowCommodity"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="ShowCommodityClassAction" class="com.demo.Action.ShowCommodityClass"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+	</bean>
+
+	<bean name="AddToCarAction" class="com.demo.Action.AddToCarAction"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+	<bean name="DeleteFromCar" class="com.demo.Action.DeleteFromCar"
+		scope="prototype">
+		<property name="commodityClassService" ref="commodityClassService" />
+		<property name="commodityService" ref="commodityService" />
+	</bean>
+
+
+</beans> 
